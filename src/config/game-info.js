@@ -7,7 +7,7 @@ module.exports = {
   name: 'Crossword Quest',            // the name players will see
   team: 'Group 6 (3-1)',            // your group's name and section, for example Bookworms (3-1)
   developer: 'jazzzt10',       // YOUR GitHub username: this build is yours
-  description: 'A Web-Based Multiplayer Real-Time Crossword Puzzle Game.',     // one sentence about how the game is played
+  description: 'A Web-Based Multiplayer Real-Time Crossword Puzzle Game for CS313.',     // one sentence about how the game is played
   min_players: 2,               // change to the limits your game is designed for
   max_players: 6,
   version: pkg.version,         // read from package.json, do not edit here

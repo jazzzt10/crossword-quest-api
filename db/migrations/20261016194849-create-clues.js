@@ -13,7 +13,10 @@ module.exports = {
       clue_id: {
         type: Sequelize.BIGINT,
         primaryKey: true,
-        autoIncrement: true
+        autoIncrement: true,
+        allowNull: false,
+        references: { model: 'clues', key: 'clue_id' },
+        onDelete: 'CASCADE'
       },
       set_id: {
         type: Sequelize.BIGINT,
