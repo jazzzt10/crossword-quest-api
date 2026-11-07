@@ -57,7 +57,7 @@ Base URL: `http://localhost:3001/api/v1`
 | GET | /health | Is the API up and can it reach the database? | 200 (503 when the database is down) |
 | GET | /game-info | Slug, name, group, developer, description, player limits, version | 200 |
 | GET | /results | Finished games, every player, and the top 3. Needs the `X-Hub-Key` header. Optional `?since=` | 200 (401 without the key) |
-
+Completed rule: a player completed a game if they solved at least one word in it.
 ## What "completed" means in my game
 
 [One or two sentences: when does a player count as having completed a game? For example: "A player completed the game when they answered every question, even if some answers were wrong or timed out."]
