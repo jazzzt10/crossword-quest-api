@@ -21,6 +21,18 @@ module.exports = {
         references: { model: 'players', key: 'player_id' },
         onDelete: 'CASCADE'
       },
+      session_id: {
+        type: Sequelize.BIGINT,
+        allowNull: false,
+        references: { model: 'game_sessions', key: 'session_id' },
+        onDelete: 'CASCADE'
+      },
+      clue_id: {
+        type: Sequelize.BIGINT,
+        allowNull: false,
+        references: { model: 'clues', key: 'clue_id' },
+        onDelete: 'CASCADE'
+      },
       points_awarded: {
         type: Sequelize.INTEGER,
         allowNull: false

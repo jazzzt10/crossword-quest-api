@@ -18,7 +18,7 @@ module.exports = {
       session_id: {
         type: Sequelize.BIGINT,
         allowNull: false,
-        references: { model: 'game_sesions', key: 'session_id' },
+       references: { model: 'game_sessions', key: 'session_id' },
         onDelete: 'CASCADE'
       },
       nickname: {
