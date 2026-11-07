@@ -35,6 +35,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.dropTable('questions_sets');
+    await queryInterface.dropTable('question_sets');
   }
 };

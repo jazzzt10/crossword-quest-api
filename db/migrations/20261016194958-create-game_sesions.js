@@ -18,7 +18,7 @@ module.exports = {
       host_id: {
         type: Sequelize.BIGINT,
         allowNull: false,
-        references: { model: 'hosts', key: 'host_id' },
+        references: { model: 'users', key: 'user_id' },
         onDelete: 'CASCADE'
       },
       set_id: {
@@ -69,6 +69,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.dropTable('game_sesions');
+   await queryInterface.dropTable('game_sessions');
   }
 };

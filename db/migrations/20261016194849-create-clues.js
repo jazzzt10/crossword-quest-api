@@ -14,9 +14,7 @@ module.exports = {
         type: Sequelize.BIGINT,
         primaryKey: true,
         autoIncrement: true,
-        allowNull: false,
-        references: { model: 'clues', key: 'clue_id' },
-        onDelete: 'CASCADE'
+        allowNull: false
       },
       set_id: {
         type: Sequelize.BIGINT,

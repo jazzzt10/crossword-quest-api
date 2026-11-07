@@ -30,6 +30,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.dropTable('crossword_grid');
+    await queryInterface.dropTable('crossword_grids');
   }
 };

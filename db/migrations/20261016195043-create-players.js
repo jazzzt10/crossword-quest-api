@@ -18,7 +18,13 @@ module.exports = {
       session_id: {
         type: Sequelize.BIGINT,
         allowNull: false,
-        references: { model: 'game_sesions', key: 'session_id' },
+        references: { model: 'game_sessions', key: 'session_id' },
+        onDelete: 'CASCADE'
+      },
+      user_id: {
+        type: Sequelize.BIGINT,
+        allowNull: false,
+        references: { model: 'users', key: 'user_id' },
         onDelete: 'CASCADE'
       },
       nickname: {
@@ -65,6 +71,11 @@ module.exports = {
       type: 'unique',
       fields: ['session_id', 'player_color'],
       name: 'unique_session_color'
+    });
+    await queryInterface.addConstraint('players', {
+      type: 'unique',
+      name: 'uq_one_seat',
+      fields: ['session_id', 'user_id']
     });
   },
 
