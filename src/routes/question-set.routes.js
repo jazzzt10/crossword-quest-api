@@ -1,0 +1,19 @@
+// One line, one row of the API endpoint table.
+const { Router } = require('express');
+const requireUser = require('../middlewares/require-user');
+const validate = require('../middlewares/validate');
+const rules = require('../validators/question-set.validator');
+const controller = require('../controllers/question-set.controller');
+
+const router = Router();
+
+// Every question-set endpoint is for hosts.
+router.use(requireUser('HOST', 'ADMIN'));
+
+router.get('/', controller.list);
+router.post('/', rules.createRules, validate, controller.create);
+router.get('/:id', rules.idParam, validate, controller.get);
+router.patch('/:id', rules.updateRules, validate, controller.update);
+router.delete('/:id', rules.idParam, validate, controller.remove);
+
+module.exports = router;

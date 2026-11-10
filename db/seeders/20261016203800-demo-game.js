@@ -12,7 +12,7 @@ module.exports = {
     const [[host]] = await db.query("SELECT user_id FROM users WHERE school_id = '2099-0001'");
 
     // 2. Question set, then its clues.
-    await queryInterface.bulkInsert('question_sets', [{ name: SET_NAME }]);
+   await queryInterface.bulkInsert('question_sets', [{ name: SET_NAME, host_id: host.user_id }]);
     const [[set]] = await db.query(`SELECT set_id FROM question_sets WHERE name = '${SET_NAME}'`);
 
     await queryInterface.bulkInsert('clues', [
