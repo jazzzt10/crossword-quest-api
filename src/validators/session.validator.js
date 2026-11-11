@@ -19,4 +19,15 @@ const statusRules = [
   body('status').isIn(['PLAYING', 'FINISHED']).withMessage('status must be PLAYING or FINISHED'),
 ];
 
-module.exports = { codeParam, createRules, statusRules };
+const joinRules = [
+  codeParam,
+  body('nickname')
+    .exists().withMessage('nickname is required')
+    .bail()
+    .isString().withMessage('nickname must be text')
+    .bail()
+    .trim()
+    .isLength({ min: 2, max: 30 }).withMessage('nickname must be 2 to 30 characters long'),
+];
+
+module.exports = { codeParam, createRules, statusRules, joinRules };
