@@ -22,4 +22,16 @@ const User = require('./user')(sequelize, DataTypes);
 const QuestionSet = require('./question-set')(sequelize, DataTypes);
 User.hasMany(QuestionSet, { foreignKey: 'host_id' });
 QuestionSet.belongsTo(User, { foreignKey: 'host_id', as: 'host' });
-module.exports = { sequelize, Sequelize, DataTypes, User, QuestionSet };
+
+const CrosswordGrid = require('./crossword-grid')(sequelize, DataTypes);
+const GameSession = require('./game-session')(sequelize, DataTypes);
+const Player = require('./player')(sequelize, DataTypes);
+
+GameSession.belongsTo(User, { foreignKey: 'host_id', as: 'host' });
+GameSession.belongsTo(QuestionSet, { foreignKey: 'set_id' });
+GameSession.belongsTo(CrosswordGrid, { foreignKey: 'grid_id' });
+GameSession.hasMany(Player, { foreignKey: 'session_id' });
+Player.belongsTo(GameSession, { foreignKey: 'session_id' });
+Player.belongsTo(User, { foreignKey: 'user_id' });
+
+module.exports = { sequelize, Sequelize, DataTypes, User, QuestionSet, CrosswordGrid, GameSession, Player };
