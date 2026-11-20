@@ -16,6 +16,7 @@ This is my own build of my group's game concept. Every commit in this repository
 | Web framework | Express 5 |
 | Database | PostgreSQL 16 or newer |
 | ORM and migrations | Sequelize 6 with sequelize-cli |
+| Passwords and login | bcryptjs and jsonwebtoken |
 
 ## Setup
 
@@ -25,7 +26,7 @@ cd crossword-quest-api
 npm install
 ```
 
-Copy `.env.example` to `.env`, then put your own PostgreSQL password in `DB_PASSWORD`.
+Copy `.env.example` to `.env`, then put your own PostgreSQL password in `DB_PASSWORD` and a long random text in `JWT_SECRET`.
 
 ```
 npm run db:create     (first time only)
@@ -47,18 +48,34 @@ npm run dev
 | DB_USER | postgres | Database user |
 | DB_PASSWORD | (your own) | Database password. Never commit this. |
 | HUB_API_KEY | dev-hub-key | Key the Library Game Hub sends to read results. The library gives the real one at deployment. |
+| JWT_SECRET | (64 random characters) | Secret that signs login tokens. Never commit this. |
+| JWT_EXPIRES_IN | 1h | How long a login token lives |
+| CORS_ORIGINS | http://localhost:5173 | Browser pages that may read the API's answers, separated by commas |
 
-## Endpoints (Hub Contract v1.2)
+## Accounts and login
+
+Every account has a role: `PLAYER`, `HOST` or `ADMIN`. A person who registers is always a `PLAYER`; only an admin can promote an account.
+
+1. `POST /auth/login` with a school ID and password answers a token.
+2. Send that token in every later request: `Authorization: Bearer <token>`.
+3. A token lives for one hour. After that, log in again.
+
+Passwords are 8 to 72 characters with at least one letter and one number. Only a bcrypt hash is stored, and it is never sent back. A wrong password and an unknown school ID get the same `401 INVALID_CREDENTIALS`, so the login cannot be used to find out which accounts exist.
+
+## Endpoints (Hub Contract v1.3)
 
 Base URL: `http://localhost:3001/api/v1`
-
-Until login is built, a caller says who they are with the `X-Demo-User` header (a school ID from the demo accounts below). The "Who may call" column shows the role each route needs.
 
 | Method | Path | Purpose | Who may call | Success |
 |---|---|---|---|---|
 | GET | /health | Is the API up and can it reach the database? | Anyone | 200 (503 when the database is down) |
 | GET | /game-info | Slug, name, group, developer, description, player limits, version | Anyone | 200 |
 | GET | /results | Finished games, every player, and the top 3. Needs the `X-Hub-Key` header. Optional `?since=` | The Library Game Hub | 200 (401 without the key, 400 for a bad `since`) |
+| POST | /auth/register | Create an account; the role is always PLAYER | Anyone | 201 |
+| POST | /auth/login | Exchange a school ID and password for a token | Anyone | 200 |
+| GET | /auth/me | The account of the token | Any logged-in account | 200 |
+| GET | /users | List every account | ADMIN | 200 |
+| PATCH | /users/:id/role | Change the role of an account (not your own) | ADMIN | 200 (409 for your own account) |
 | GET | /question-sets | List my question sets (an admin sees all) | HOST, ADMIN | 200 |
 | POST | /question-sets | Create a question set; the caller becomes the owner | HOST, ADMIN | 201 |
 | GET | /question-sets/:id | Read one question set | Owner, ADMIN | 200 |
@@ -75,14 +92,14 @@ Every error answers with the same shape: `{ "error": { "code": "...", "message":
 | Status | Codes |
 |---|---|
 | 400 | VALIDATION_FAILED, INVALID_JSON, INVALID_SINCE |
-| 401 | AUTH_REQUIRED, HUB_KEY_REQUIRED |
+| 401 | AUTH_REQUIRED, INVALID_TOKEN, INVALID_CREDENTIALS, HUB_KEY_REQUIRED |
 | 403 | FORBIDDEN |
-| 404 | NOT_FOUND, QUESTION_SET_NOT_FOUND, SESSION_NOT_FOUND |
-| 409 | QUESTION_SET_NAME_TAKEN, QUESTION_SET_IN_USE, NICKNAME_TAKEN, NOT_ENOUGH_PLAYERS, SESSION_NOT_JOINABLE, SESSION_ENDED, SESSION_FULL, INVALID_STATUS_CHANGE |
+| 404 | NOT_FOUND, USER_NOT_FOUND, QUESTION_SET_NOT_FOUND, SESSION_NOT_FOUND |
+| 409 | SCHOOL_ID_TAKEN, EMAIL_TAKEN, CANNOT_CHANGE_OWN_ROLE, QUESTION_SET_NAME_TAKEN, QUESTION_SET_IN_USE, NICKNAME_TAKEN, NOT_ENOUGH_PLAYERS, SESSION_NOT_JOINABLE, SESSION_ENDED, SESSION_FULL, INVALID_STATUS_CHANGE |
 
 ## Demo accounts
 
-All demo data is fictitious. School IDs start with 2099 and emails end in `.test`.
+All demo data is fictitious. School IDs start with 2099 and emails end in `.test`. Every demo account has the same password: `Crossword-Demo-2026`. It only exists in the seed data on a development computer.
 
 | School ID | Role | Name |
 |---|---|---|
@@ -106,7 +123,7 @@ A game moves only forward: `WAITING` (players may join), `PLAYING` (the game run
 
 In the order of the migrations:
 
-1. `users`: every account, with a role (PLAYER, HOST or ADMIN).
+1. `users`: every account, with a role (PLAYER, HOST or ADMIN) and a bcrypt password hash.
 2. `question_sets`: a named set of clues, owned by a host (`host_id`).
 3. `clues`: one crossword clue and its answer, in a question set.
 4. `crossword_grids`: the grid of one game.
@@ -128,7 +145,7 @@ In the order of the migrations:
 
 ## Testing with Postman
 
-The collection is in `postman/crossword-quest-week11.postman_collection.json`: 62 requests, in two folders (question sets, and sessions and players).
+The collection is in `postman/crossword-quest-week11.postman_collection.json`: 90 requests in four folders (log in, accounts, question sets, and sessions and players). The first folder logs in the demo accounts and saves their tokens, so run the whole collection from the top.
 
 ```
 npm run db:reset
@@ -136,4 +153,4 @@ npm start
 npx newman run postman/crossword-quest-week11.postman_collection.json
 ```
 
-All 62 requests and 120 assertions pass.
+All 90 requests and 187 assertions pass.

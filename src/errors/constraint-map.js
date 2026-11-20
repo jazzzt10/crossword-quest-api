@@ -26,4 +26,14 @@ module.exports = {
     code: 'COLOR_TAKEN',
     message: 'That color is already used in this game.',
   },
+    users_school_id_key: {
+    status: 409,
+    code: 'SCHOOL_ID_TAKEN',
+    message: 'An account with that school ID already exists.',
+  },
+  users_email_key: {
+    status: 409,
+    code: 'EMAIL_TAKEN',
+    message: 'An account with that email already exists.',
+  },
 };
